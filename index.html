@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jukebooth Producer Dashboard</title>
+  <style>
+    :root {
+      --bg: #071019;
+      --bg2: #0b1622;
+      --panel: rgba(10, 18, 29, 0.82);
+      --panel-strong: #0d1b2a;
+      --line: rgba(148, 163, 184, 0.15);
+      --text: #ecf4ff;
+      --muted: #8fa3bf;
+      --muted-2: #6d7f98;
+      --accent: #67e8f9;
+      --accent-2: #7c3aed;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --bad: #fb7185;
+      --chip: rgba(103, 232, 249, 0.12);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --max: 1440px;
+      --space: clamp(14px, 2vw, 22px);
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(103,232,249,0.14), transparent 28%),
+        radial-gradient(circle at 80% 10%, rgba(124,58,237,0.18), transparent 32%),
+        linear-gradient(180deg, var(--bg), var(--bg2) 72%, #050a10 100%);
+      background-attachment: fixed;
+    }
+
+    .app {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 18px;
+      min-height: calc(100vh - 36px);
+    }
+
+    .sidebar,
+    .main,
+    .card,
+    .section,
+    .panel {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(9,16,25,0.92), rgba(10,18,29,0.76));
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: sticky;
+      top: 18px;
+      height: calc(100vh - 36px);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+      text-align: left;
+      transition: 180ms ease;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      border-color: rgba(103,232,249,0.35);
+      background: linear-gradient(90deg, rgba(103,232,249,0.12), rgba(124,58,237,0.11));
+      transform: translateY(-1px);
+    }
+
+    .nav .count {
+      min-width: 32px;
+      height: 28px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(103,232,249,0.12);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .sidebar .mini {
+      display: grid;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .mini .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(103,232,249,0.08);
+      color: var(--accent);
+      font-size: 0.78rem;
+      border: 1px solid rgba(103,232,249,0.16);
+    }
+
+    .main {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .title-block h2 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2vw, 2.2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .title-block .sub {
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 70ch;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search,
+    .action,
+    .select,
+    .input,
+    .textarea {
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.18);
+      background: rgba(6, 12, 20, 0.7);
+      color: var(--text);
+      font: inherit;
+      padding: 12px 14px;
+      outline: none;
+      transition: 180ms ease;
+    }
+
+    .search:focus,
+    .select:focus,
+    .input:focus,
+    .textarea:focus {
+      border-color: rgba(103,232,249,0.45);
+      box-shadow: 0 0 0 4px rgba(103,232,249,0.08);
+    }
+
+    .search { min-width: min(100%, 260px); flex: 1 1 260px; }
+
+    .action {
+      cursor: pointer;
+      background: linear-gradient(135deg, rgba(103,232,249,0.16), rgba(124,58,237,0.14));
+      border-color: rgba(103,232,249,0.22);
+      font-weight: 650;
+    }
+
+    .action.secondary {
+      background: rgba(255,255,255,0.03);
+      border-color: rgba(148,163,184,0.18);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(14,22,34,0.92), rgba(9,16,25,0.82));
+      border: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-bottom: 10px;
+    }
+
+    .metric .value {
+      font-size: clamp(1.5rem, 2.3vw, 2.35rem);
+      font-weight: 760;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .metric .foot {
+      margin-top: 10px;
+      color: var(--muted-2);
+      font-size: 0.88rem;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .section {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      min-width: 0;
+    }
+
+    .section h3 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section p,
+    .card p,
+    .footer-note,
+    .small {
+      color: #9fb1c9;
+    }
+
+    .card p,
+    .note-box p {
+      max-width: 70ch;
+    }
+
+    .table-wrap td:nth-child(5) {
+      color: #c9d6e6;
+    }
+
+    .table-wrap td {
+      line-height: 1.45;
+    }
+
+    .table-wrap tbody tr:nth-child(even) td {
+      background: rgba(255,255,255,0.015);
+    }
+
+    .table-wrap th,
+    .table-wrap td {
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+
+    .overview-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(103,232,249,0.18);
+      background: rgba(103,232,249,0.08);
+      color: #dffcff;
+      font-size: 0.82rem;
+      margin-bottom: 12px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.18);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.92rem;
+    }
+
+    .tab.active {
+      border-color: rgba(103,232,249,0.4);
+      background: rgba(103,232,249,0.12);
+      color: #d9fbff;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,0.14);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+      min-width: 780px;
+    }
+
+    th, td {
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(148,163,184,0.12);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #0c1826;
+      color: #cfe4ff;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    tr:hover td { background: rgba(103,232,249,0.03); }
+
+    .muted { color: var(--muted); }
+    .mono { font-family: var(--mono); }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      line-height: 1;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.9;
+    }
+
+    .status.unpaid, .status.waiting, .status.pending { color: #fbbf24; background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.2); }
+    .status.sent, .status.review, .status.approval { color: #67e8f9; background: rgba(103,232,249,0.12); border-color: rgba(103,232,249,0.2); }
+    .status.paid, .status.completed, .status.delivered, .status.archived, .status.done { color: #34d399; background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.2); }
+    .status.risk { color: #fb7185; background: rgba(251,113,133,0.12); border-color: rgba(251,113,133,0.2); }
+
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      border-radius: 18px;
+      padding: 14px;
+      border: 1px solid rgba(148,163,184,0.14);
+      background: linear-gradient(180deg, rgba(11,20,31,0.92), rgba(8,15,24,0.88));
+    }
+
+    .card .row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card h4 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.93rem;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .form .full { grid-column: 1 / -1; }
+    .input, .select, .textarea { width: 100%; }
+    .textarea { min-height: 88px; resize: vertical; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .small {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .kpi-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .kpi-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(148,163,184,0.12);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .kpi-item b {
+      font-size: 0.95rem;
+    }
+
+    .footer-note {
+      color: var(--muted-2);
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .hidden { display: none !important; }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .icon-btn {
+      border: 1px solid rgba(148,163,184,0.14);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.82rem;
+    }
+
+    .icon-btn:hover { border-color: rgba(103,232,249,0.34); }
+
+    .subtle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .note-box {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(103,232,249,0.14);
+      background: rgba(103,232,249,0.05);
+    }
+
+    .note-box h4 { margin: 0 0 6px; font-size: 0.98rem; }
+    .note-box p { margin: 0; color: var(--muted); line-height: 1.5; }
+
+    @media (max-width: 1120px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { position: relative; top: 0; height: auto; }
+      .content-grid, .metrics, .subtle-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .app { padding: 12px; }
+      .main, .sidebar { border-radius: 20px; }
+      .form { grid-template-columns: 1fr; }
+      .toolbar { width: 100%; }
+      .search { flex-basis: 100%; }
+      .tabs { width: 100%; }
+      .tab { flex: 1 1 auto; }
+      .section { padding: 14px; }
+      table { min-width: 680px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>Jukebooth Producer Dashboard</h1>
+          <p>Fast, mobile-friendly command center for projects, invoices, contractors, and deliverables.</p>
+        </div>
+
+        <nav class="nav" id="nav"></nav>
+
+        <div class="mini">
+          <div class="pill-row">
+            <span class="pill">Local persistence</span>
+            <span class="pill">Search + filters</span>
+            <span class="pill">Mobile friendly</span>
+          </div>
+          <div class="footer-note">
+            Built to keep everything organized without mixing invoices, payables, or edits.
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="title-block">
+            <h2>Operations overview</h2>
+            <div class="sub">A clean producer-style dashboard for tracking what’s owed, what’s approved, what’s pending, and what still needs to be delivered.</div>
+          </div>
+          <div class="toolbar">
+            <input class="search" id="search" placeholder="Search projects, names, notes..." />
+            <button class="action secondary" id="exportBtn">Export JSON</button>
+            <label class="action secondary" for="importFile" style="cursor:pointer;">Import JSON</label>
+            <input id="importFile" type="file" accept="application/json" class="hidden" />
+            <button class="action secondary" id="resetBtn">Reset sample</button>
+          </div>
+        </div>
+
+        <section class="metrics" id="metrics"></section>
+
+        <section class="section">
+          <div class="section-header">
+            <h3>Quick view</h3>
+            <div class="tabs" id="tabs"></div>
+          </div>
+          <div class="content-grid">
+            <div class="section" style="padding:0;border:none;background:transparent;box-shadow:none;">
+              <div class="table-wrap" id="tableWrap"></div>
+            </div>
+            <div class="cards" id="sidePanel"></div>
+          </div>
+        </section>
+
+        <section class="subtle-grid">
+          <div class="section">
+            <h3>Add new item</h3>
+            <div class="small" id="formHint">Pick a tab first, then add a row to that list.</div>
+            <div class="form" id="dynamicForm"></div>
+            <div class="actions">
+              <button class="action" id="addBtn">Add record</button>
+              <button class="action secondary" id="clearFiltersBtn">Clear search</button>
+            </div>
+          </div>
+          <div class="section">
+            <h3>Producer notes</h3>
+            <div class="kpi-list" id="notesList"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'jukebooth_dashboard_v1';
+
+    const defaultState = {
+      contractors: [
+        { contractor: 'Dan Modern', email: 'dan@jukebooth.com', phone: '', role: 'Filming', project: 'Throwback Brewery filming + High Vista corporate event filming', amount: 1700, status: 'Unpaid', notes: '' },
+        { contractor: 'Jon King', email: 'Jon@jukebooth.com', phone: '', role: 'Filming / Editing', project: 'Bogs Throwback filming + editing', amount: 2350, status: 'Unpaid', notes: '' },
+        { contractor: 'Djim Reynolds', email: 'djimofon@protonmail.com', phone: '', role: 'Sound Op', project: 'Boston sound op', amount: 900, status: 'Unpaid', notes: '' },
+        { contractor: 'Jake Doucette', email: 'jake@phittedmedia.com', phone: '', role: 'Photography', project: 'Bogs Throwback photography', amount: 1500, status: 'Unpaid', notes: '' },
+        { contractor: 'Carl Heyerdahl', email: 'carlheyerdahl@gmail.com', phone: '', role: 'Photography', project: 'High Vista — 2 days photo', amount: 4000, status: 'Unpaid', notes: '' },
+        { contractor: 'Cate Schappert', email: 'cateschappert@gmail.com', phone: '', role: 'Producing', project: 'Bogs Throwback producing', amount: 1515.73, status: 'Unpaid', notes: '' }
+      ],
+      invoices: [
+        { client: 'Stoke Shoes', project: 'May invoice', amount: null, status: 'Waiting to collect', notes: 'Amount not provided yet' },
+        { client: 'Bogs', project: 'Overland video + photography invoice', amount: 15000, status: 'Sent for approval', notes: 'Awaiting client approval' },
+        { client: 'Bogs', project: 'Throwback Brewery invoice', amount: 15000, status: 'Waiting to collect', notes: '' },
+        { client: 'High Vista', project: 'Job invoice', amount: 0, status: 'Paid in full', notes: 'Completed' }
+      ],
+      deliverables: [
+        { client: 'Bogs', project: 'Overland', deliverable: '30s AB edit', status: 'Pending', notes: 'Awaiting approval before edit' },
+        { client: 'Bogs', project: 'Overland', deliverable: '2x 15s edits', status: 'Pending', notes: 'Need 2 short edits after approval' },
+        { client: 'Bogs', project: 'Overland', deliverable: 'Behind-the-scenes edit', status: 'Pending', notes: 'Need BTS edit after approval' }
+      ],
+      projects: [
+        { project: 'Throwback Brewery filming', client: '', stage: 'Production', deliverables: '', due: '', payment: '', contractor: '', notes: 'Linked to Dan Modern payables' },
+        { project: 'High Vista corporate event', client: '', stage: 'Delivered', deliverables: '', due: '', payment: 'Paid in full', contractor: '', notes: 'Linked to Dan Modern + Carl Heyerdahl payables' },
+        { project: 'Bogs Throwback', client: '', stage: 'Review', deliverables: '', due: '', payment: 'Invoice sent / awaiting approval', contractor: '', notes: 'Linked to Jon King, Jake Doucette, and Cate Schappert payables' },
+        { project: 'Boston sound op', client: '', stage: 'Delivered', deliverables: '', due: '', payment: '', contractor: '', notes: 'Linked to Djim Reynolds payable' }
+      ],
+      contacts: [
+        { name: 'Dan Modern', email: 'dan@jukebooth.com', phone: '', company: '', role: 'Contractor' },
+        { name: 'Jon King', email: 'Jon@jukebooth.com', phone: '', company: '', role: 'Contractor' },
+        { name: 'Djim Reynolds', email: 'djimofon@protonmail.com', phone: '', company: '', role: 'Contractor' },
+        { name: 'Jake Doucette', email: 'jake@phittedmedia.com', phone: '', company: '', role: 'Contractor' },
+        { name: 'Carl Heyerdahl', email: 'carlheyerdahl@gmail.com', phone: '', company: '', role: 'Contractor' },
+        { name: 'Cate Schappert', email: 'cateschappert@gmail.com', phone: '', company: '', role: 'Contractor' }
+      ]
+    };
+
+    const formSchemas = {
+      contractors: [
+        { key: 'contractor', label: 'Name', type: 'text', placeholder: 'Contractor name' },
+        { key: 'email', label: 'Email', type: 'email', placeholder: 'name@example.com' },
+        { key: 'phone', label: 'Phone', type: 'text', placeholder: 'Phone number' },
+        { key: 'role', label: 'Role', type: 'text', placeholder: 'Filming, editing...' },
+        { key: 'project', label: 'Project', type: 'text', placeholder: 'Project / notes', full: true },
+        { key: 'amount', label: 'Amount owed', type: 'number', placeholder: '0.00', step: '0.01' },
+        { key: 'status', label: 'Status', type: 'select', options: ['Unpaid', 'Paid', 'Scheduled'] },
+        { key: 'notes', label: 'Notes', type: 'text', placeholder: 'Extra notes', full: true }
+      ],
+      invoices: [
+        { key: 'client', label: 'Client', type: 'text', placeholder: 'Bogs' },
+        { key: 'project', label: 'Invoice / project', type: 'text', placeholder: 'Overland video + photography' },
+        { key: 'amount', label: 'Amount', type: 'number', placeholder: '15000', step: '0.01' },
+        { key: 'status', label: 'Status', type: 'select', options: ['Waiting to collect', 'Sent for approval', 'Paid in full', 'Completed'] },
+        { key: 'notes', label: 'Notes', type: 'text', placeholder: 'Any notes', full: true }
+      ],
+      deliverables: [
+        { key: 'client', label: 'Client', type: 'text', placeholder: 'Bogs' },
+        { key: 'project', label: 'Project', type: 'text', placeholder: 'Overland' },
+        { key: 'deliverable', label: 'Deliverable', type: 'text', placeholder: '30s AB edit' },
+        { key: 'status', label: 'Status', type: 'select', options: ['Pending', 'Editing', 'Awaiting approval', 'Delivered'] },
+        { key: 'notes', label: 'Notes', type: 'text', placeholder: 'Any notes', full: true }
+      ],
+      projects: [
+        { key: 'project', label: 'Project', type: 'text', placeholder: 'Project name' },
+        { key: 'client', label: 'Client', type: 'text', placeholder: 'Client' },
+        { key: 'stage', label: 'Stage', type: 'select', options: ['Inquiry', 'Estimating', 'Proposal', 'Pre-Production', 'Production', 'Post-Production', 'Review', 'Delivered', 'Archived'] },
+        { key: 'deliverables', label: 'Deliverables', type: 'text', placeholder: 'List deliverables', full: true },
+        { key: 'due', label: 'Due date', type: 'text', placeholder: 'YYYY-MM-DD' },
+        { key: 'payment', label: 'Payment', type: 'text', placeholder: 'Paid / pending' },
+        { key: 'contractor', label: 'Contractor', type: 'text', placeholder: 'Main contractor' },
+        { key: 'notes', label: 'Notes', type: 'text', placeholder: 'Risk / notes', full: true }
+      ],
+      contacts: [
+        { key: 'name', label: 'Name', type: 'text', placeholder: 'Contact name' },
+        { key: 'email', label: 'Email', type: 'email', placeholder: 'name@example.com' },
+        { key: 'phone', label: 'Phone', type: 'text', placeholder: 'Phone number' },
+        { key: 'company', label: 'Company', type: 'text', placeholder: 'Company', full: true },
+        { key: 'role', label: 'Role', type: 'text', placeholder: 'Client / contractor / vendor' }
+      ]
+    };
+
+    const state = loadState();
+    let activeTab = 'invoices';
+    let searchTerm = '';
+    let draft = {};
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved ? mergeDeep(structuredClone(defaultState), saved) : structuredClone(defaultState);
+      } catch (err) {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function mergeDeep(base, incoming) {
+      for (const key of Object.keys(incoming || {})) {
+        if (Array.isArray(incoming[key])) base[key] = incoming[key];
+        else if (incoming[key] && typeof incoming[key] === 'object') base[key] = mergeDeep(base[key] || {}, incoming[key]);
+        else base[key] = incoming[key];
+      }
+      return base;
+    }
+
+    function money(value) {
+      if (value === null || value === undefined || value === '') return '—';
+      const n = Number(value);
+      if (!Number.isFinite(n)) return String(value);
+      return n === 0 ? 'Paid in full' : n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    function moneyPlain(value) {
+      if (value === null || value === undefined || value === '') return 0;
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function statusClass(status) {
+      const s = String(status || '').toLowerCase();
+      if (s.includes('paid') || s.includes('completed') || s.includes('delivered') || s.includes('archived') || s.includes('done')) return 'paid';
+      if (s.includes('sent') || s.includes('review') || s.includes('approval') || s.includes('awaiting')) return 'sent';
+      if (s.includes('pending') || s.includes('waiting') || s.includes('unpaid')) return 'waiting';
+      if (s.includes('risk')) return 'risk';
+      return 'waiting';
+    }
+
+    function formatLabel(key) {
+      return key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
+    }
+
+    function safe(v) {
+      return String(v ?? '').replace(/[&<>]/g, s => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[s]));
+    }
+
+    function matches(item) {
+      const q = searchTerm.trim().toLowerCase();
+      if (!q) return true;
+      return Object.values(item).some(v => String(v ?? '').toLowerCase().includes(q));
+    }
+
+    function filtered(key) {
+      return state[key].filter(matches);
+    }
+
+    function totalContractors() {
+      return state.contractors.reduce((sum, item) => sum + moneyPlain(item.amount), 0);
+    }
+
+    function totalInvoices() {
+      return state.invoices.reduce((sum, item) => sum + (item.amount === null ? 0 : moneyPlain(item.amount)), 0);
+    }
+
+    function totalOutstandingInvoices() {
+      return state.invoices.reduce((sum, item) => {
+        const amt = item.amount === null ? 0 : moneyPlain(item.amount);
+        if (/paid in full|completed/i.test(item.status)) return sum;
+        return sum + amt;
+      }, 0);
+    }
+
+    function pendingDeliverables() {
+      return state.deliverables.filter(d => !/delivered/i.test(d.status)).length;
+    }
+
+    function activeProjects() {
+      return state.projects.filter(p => !/archived/i.test(p.stage)).length;
+    }
+
+    function renderNav() {
+      const nav = document.getElementById('nav');
+      const items = [
+        ['overview', 'Overview'],
+        ['invoices', 'Invoices'],
+        ['contractors', 'Contractors'],
+        ['deliverables', 'Deliverables'],
+        ['projects', 'Projects'],
+        ['contacts', 'Contacts']
+      ];
+      nav.innerHTML = items.map(([key, label]) => {
+        const count = key === 'overview' ? 6 : state[key].length;
+        return `<button class="${activeTab === key ? 'active' : ''}" data-tab="${key}"><span>${label}</span><span class="count">${count}</span></button>`;
+      }).join('');
+      nav.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+        activeTab = btn.dataset.tab;
+        render();
+      }));
+    }
+
+    function renderMetrics() {
+      const outstanding = totalOutstandingInvoices();
+      const knownInvoices = state.invoices.filter(i => i.amount !== null && !/paid in full|completed/i.test(i.status)).length;
+      const contractorBalance = totalContractors();
+      const deliverableCount = pendingDeliverables();
+      const activeCount = activeProjects();
+      const paidCount = state.invoices.filter(i => /paid in full|completed/i.test(i.status)).length;
+
+      document.getElementById('metrics').innerHTML = `
+        <div class="metric">
+          <div class="label">Open client invoices</div>
+          <div class="value">${money(outstanding)}</div>
+          <div class="foot">${knownInvoices} invoice(s) currently awaiting collection or approval.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Contractor payables</div>
+          <div class="value">${money(contractorBalance)}</div>
+          <div class="foot">What still needs to go out to the crew.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Deliverables in queue</div>
+          <div class="value">${deliverableCount}</div>
+          <div class="foot">Pending edits, approvals, and final deliveries.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Active projects</div>
+          <div class="value">${activeCount}</div>
+          <div class="foot">${paidCount} completed invoice(s) already closed out.</div>
+        </div>
+      `;
+    }
+
+    function makeTable(key) {
+      const data = filtered(key);
+      const columns = Object.keys(state[key][0] || {});
+      const headers = columns.concat(['actions']);
+      const labels = columns.map(formatLabel).concat(['']);
+
+      let html = '<div class="table-wrap"><table><thead><tr>';
+      labels.forEach(label => { html += `<th>${label}</th>`; });
+      html += '</tr></thead><tbody>';
+      if (!data.length) {
+        html += `<tr><td colspan="${headers.length}"><span class="muted">No records match your search.</span></td></tr>`;
+      } else {
+        data.forEach((item, idx) => {
+          html += '<tr>';
+          columns.forEach(col => {
+            const val = item[col];
+            if (col === 'status' || col === 'stage' || col === 'payment') {
+              html += `<td><span class="status ${statusClass(val)}">${safe(val || '—')}</span></td>`;
+            } else if (col === 'amount') {
+              html += `<td>${item.amount === null ? '—' : money(item.amount)}</td>`;
+            } else {
+              html += `<td>${safe(val || '—')}</td>`;
+            }
+          });
+          html += `<td><div class="row-actions"><button class="icon-btn" data-edit="${key}:${idx}">Edit</button><button class="icon-btn" data-del="${key}:${idx}">Delete</button></div></td>`;
+          html += '</tr>';
+        });
+      }
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    function overviewPanel() {
+      return `
+        <div class="overview-kicker">Producer command center</div>
+        <div class="cards">
+          <div class="card">
+            <div class="row"><h4>Current focus</h4><span class="status review">Priority</span></div>
+            <p>${state.invoices.filter(i => /sent for approval|waiting to collect/i.test(i.status)).length} client invoices are still open, and ${state.deliverables.filter(d => !/delivered/i.test(d.status)).length} deliverables are waiting in the queue.</p>
+          </div>
+          <div class="card">
+            <div class="row"><h4>Top money to collect</h4><span class="status sent">Collection</span></div>
+            <p>Bogs: <b>${money(15000)}</b> for Overland video + photography invoice and <b>${money(15000)}</b> for Throwback Brewery invoice. Stoke Shoes still needs an amount.</p>
+          </div>
+          <div class="card">
+            <div class="row"><h4>Payables snapshot</h4><span class="status waiting">Crew</span></div>
+            <p>Total contractor balance is <b>${money(totalContractors())}</b>. This is the cash outflow side to keep lined up once invoices come in.</p>
+          </div>
+          <div class="card">
+            <div class="row"><h4>Navigation tip</h4><span class="status done">Easy update</span></div>
+            <p>Use the tabs for each list. Search works across every field. Add rows directly from the form below, or import/export the whole tracker as JSON.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function notesPanel() {
+      return `
+        <div class="kpi-item"><div><b>Invoice tracker</b><div class="small">Separate from deliverables so nothing gets mixed up.</div></div><span class="status sent">${state.invoices.length}</span></div>
+        <div class="kpi-item"><div><b>Contractor ledger</b><div class="small">Email, role, amount owed, and notes in one place.</div></div><span class="status waiting">${state.contractors.length}</span></div>
+        <div class="kpi-item"><div><b>Deliverables queue</b><div class="small">Edits / approvals / delivery steps.</div></div><span class="status pending">${state.deliverables.length}</span></div>
+        <div class="kpi-item"><div><b>Persistent updates</b><div class="small">Saves in localStorage on this device/browser.</div></div><span class="status done">On</span></div>
+      `;
+    }
+
+    function renderTabs() {
+      const tabs = document.getElementById('tabs');
+      const list = [
+        ['overview', 'Overview'],
+        ['invoices', 'Invoices'],
+        ['contractors', 'Contractors'],
+        ['deliverables', 'Deliverables'],
+        ['projects', 'Projects'],
+        ['contacts', 'Contacts']
+      ];
+      tabs.innerHTML = list.map(([key, label]) => `<button class="tab ${activeTab === key ? 'active' : ''}" data-tab="${key}">${label}</button>`).join('');
+      tabs.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+        activeTab = btn.dataset.tab;
+        render();
+      }));
+    }
+
+    function renderTable() {
+      const wrap = document.getElementById('tableWrap');
+      wrap.innerHTML = activeTab === 'overview' ? overviewPanel() : makeTable(activeTab);
+      wrap.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', onDelete));
+      wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', onEdit));
+    }
+
+    function renderSidePanel() {
+      const panel = document.getElementById('sidePanel');
+      panel.innerHTML = overviewPanel();
+    }
+
+    function renderNotes() {
+      document.getElementById('notesList').innerHTML = notesPanel();
+    }
+
+    function renderForm() {
+      const hint = document.getElementById('formHint');
+      const form = document.getElementById('dynamicForm');
+      if (activeTab === 'overview') {
+        hint.textContent = 'Choose a tab to add a new record.';
+        form.innerHTML = `<div class="note-box full"><h4>No form on overview</h4><p>Select Invoices, Contractors, Deliverables, Projects, or Contacts to add a record.</p></div>`;
+        return;
+      }
+      hint.textContent = `Add a new ${activeTab.slice(0, -1)} record below.`;
+      const schema = formSchemas[activeTab];
+      form.innerHTML = schema.map(field => {
+        const id = `field-${field.key}`;
+        if (field.type === 'select') {
+          return `<div class="${field.full ? 'full' : ''}"><label class="small" for="${id}">${field.label}</label><select class="select" id="${id}" data-field="${field.key}">${field.options.map(o => `<option value="${safe(o)}">${safe(o)}</option>`).join('')}</select></div>`;
+        }
+        if (field.type === 'textarea') {
+          return `<div class="${field.full ? 'full' : ''}"><label class="small" for="${id}">${field.label}</label><textarea class="textarea" id="${id}" data-field="${field.key}" placeholder="${safe(field.placeholder || '')}"></textarea></div>`;
+        }
+        return `<div class="${field.full ? 'full' : ''}"><label class="small" for="${id}">${field.label}</label><input class="input" id="${id}" data-field="${field.key}" type="${field.type}" ${field.step ? `step="${field.step}"` : ''} placeholder="${safe(field.placeholder || '')}" /></div>`;
+      }).join('');
+    }
+
+    function gatherDraft() {
+      const container = document.getElementById('dynamicForm');
+      const fields = container.querySelectorAll('[data-field]');
+      const item = {};
+      fields.forEach(field => {
+        const key = field.dataset.field;
+        let val = field.value.trim();
+        if (key === 'amount') {
+          item[key] = val === '' ? null : Number(val);
+        } else if (val === '') {
+          item[key] = '';
+        } else {
+          item[key] = val;
+        }
+      });
+      return item;
+    }
+
+    function clearDraftFields() {
+      const container = document.getElementById('dynamicForm');
+      container.querySelectorAll('[data-field]').forEach(el => {
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
+      });
+    }
+
+    function onDelete(e) {
+      const [key, idx] = e.currentTarget.dataset.del.split(':');
+      state[key].splice(Number(idx), 1);
+      saveState();
+      render();
+    }
+
+    function onEdit(e) {
+      const [key, idx] = e.currentTarget.dataset.edit.split(':');
+      const item = state[key][Number(idx)];
+      activeTab = key;
+      render();
+      setTimeout(() => {
+        const form = document.getElementById('dynamicForm');
+        Object.entries(item).forEach(([k, v]) => {
+          const el = form.querySelector(`[data-field="${k}"]`);
+          if (el) el.value = v ?? '';
+        });
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }, 0);
+      state[key].splice(Number(idx), 1);
+      saveState();
+    }
+
+    function addRecord() {
+      if (activeTab === 'overview') return;
+      const item = gatherDraft();
+      const required = formSchemas[activeTab].filter(f => !f.full).map(f => f.key);
+      const hasAny = required.some(k => item[k] !== '' && item[k] !== null && item[k] !== undefined);
+      if (!hasAny) {
+        alert('Fill in at least the main fields before adding a record.');
+        return;
+      }
+      state[activeTab].unshift(item);
+      saveState();
+      clearDraftFields();
+      render();
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'jukebooth_dashboard_export.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function importJSON(file) {
+      const text = await file.text();
+      const incoming = JSON.parse(text);
+      const merged = mergeDeep(structuredClone(defaultState), incoming);
+      Object.assign(state, merged);
+      saveState();
+      render();
+    }
+
+    function wireEvents() {
+      document.getElementById('search').addEventListener('input', e => {
+        searchTerm = e.target.value;
+        render();
+      });
+      document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+        searchTerm = '';
+        document.getElementById('search').value = '';
+        render();
+      });
+      document.getElementById('addBtn').addEventListener('click', addRecord);
+      document.getElementById('exportBtn').addEventListener('click', exportJSON);
+      document.getElementById('importFile').addEventListener('change', async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          await importJSON(file);
+          alert('Imported successfully.');
+        } catch (err) {
+          alert('Could not import JSON.');
+        }
+        e.target.value = '';
+      });
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        if (!confirm('Reset the dashboard to the sample data? This clears your saved edits in this browser.')) return;
+        Object.assign(state, structuredClone(defaultState));
+        saveState();
+        searchTerm = '';
+        document.getElementById('search').value = '';
+        render();
+      });
+    }
+
+    function render() {
+      renderNav();
+      renderTabs();
+      renderMetrics();
+      renderTable();
+      renderSidePanel();
+      renderNotes();
+      renderForm();
+      saveState();
+    }
+
+    wireEvents();
+    render();
+  </script>
+</body>
+</html>
