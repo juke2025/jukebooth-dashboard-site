@@ -6,23 +6,23 @@
   <title>Jukebooth Producer Dashboard</title>
   <style>
     :root {
-      --bg: #071019;
-      --bg2: #0b1622;
-      --panel: rgba(10, 18, 29, 0.82);
-      --panel-strong: #0d1b2a;
-      --line: rgba(148, 163, 184, 0.15);
-      --text: #ecf4ff;
-      --muted: #8fa3bf;
-      --muted-2: #6d7f98;
-      --accent: #67e8f9;
-      --accent-2: #7c3aed;
-      --good: #34d399;
-      --warn: #fbbf24;
-      --bad: #fb7185;
-      --chip: rgba(103, 232, 249, 0.12);
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-      --radius-lg: 24px;
-      --radius-md: 18px;
+      --bg: #f4f7fb;
+      --bg2: #eef3f9;
+      --panel: rgba(255, 255, 255, 0.82);
+      --panel-strong: #ffffff;
+      --line: rgba(15, 23, 42, 0.08);
+      --text: #0f172a;
+      --muted: #5d6b81;
+      --muted-2: #7a8799;
+      --accent: #2563eb;
+      --accent-2: #0f766e;
+      --good: #059669;
+      --warn: #b45309;
+      --bad: #e11d48;
+      --chip: rgba(37, 99, 235, 0.10);
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+      --radius-lg: 22px;
+      --radius-md: 16px;
       --radius-sm: 12px;
       --max: 1440px;
       --space: clamp(14px, 2vw, 22px);
@@ -37,9 +37,9 @@
       font-family: var(--font);
       color: var(--text);
       background:
-        radial-gradient(circle at 20% 0%, rgba(103,232,249,0.14), transparent 28%),
-        radial-gradient(circle at 80% 10%, rgba(124,58,237,0.18), transparent 32%),
-        linear-gradient(180deg, var(--bg), var(--bg2) 72%, #050a10 100%);
+        radial-gradient(circle at 18% 0%, rgba(37,99,235,0.10), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(15,118,110,0.08), transparent 28%),
+        linear-gradient(180deg, var(--bg), var(--bg2) 72%, #e9eef5 100%);
       background-attachment: fixed;
     }
 
@@ -62,8 +62,8 @@
     .section,
     .panel {
       border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(9,16,25,0.92), rgba(10,18,29,0.76));
-      backdrop-filter: blur(20px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.92));
+      backdrop-filter: blur(18px);
       box-shadow: var(--shadow);
     }
 
@@ -121,8 +121,8 @@
 
     .nav button:hover,
     .nav button.active {
-      border-color: rgba(103,232,249,0.35);
-      background: linear-gradient(90deg, rgba(103,232,249,0.12), rgba(124,58,237,0.11));
+      border-color: rgba(37,99,235,0.22);
+      background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(15,118,110,0.06));
       transform: translateY(-1px);
     }
 
@@ -153,10 +153,10 @@
     .pill {
       padding: 7px 10px;
       border-radius: 999px;
-      background: rgba(103,232,249,0.08);
+      background: rgba(37,99,235,0.08);
       color: var(--accent);
       font-size: 0.78rem;
-      border: 1px solid rgba(103,232,249,0.16);
+      border: 1px solid rgba(37,99,235,0.12);
     }
 
     .main {
@@ -222,14 +222,14 @@
 
     .action {
       cursor: pointer;
-      background: linear-gradient(135deg, rgba(103,232,249,0.16), rgba(124,58,237,0.14));
-      border-color: rgba(103,232,249,0.22);
+      background: linear-gradient(135deg, rgba(37,99,235,0.14), rgba(15,118,110,0.10));
+      border-color: rgba(37,99,235,0.16);
       font-weight: 650;
     }
 
     .action.secondary {
-      background: rgba(255,255,255,0.03);
-      border-color: rgba(148,163,184,0.18);
+      background: rgba(255,255,255,0.72);
+      border-color: rgba(15,23,42,0.10);
       color: var(--text);
       font-weight: 600;
     }
@@ -243,7 +243,7 @@
     .metric {
       border-radius: var(--radius-md);
       padding: 16px;
-      background: linear-gradient(180deg, rgba(14,22,34,0.92), rgba(9,16,25,0.82));
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,250,253,0.96));
       border: 1px solid var(--line);
       min-width: 0;
     }
@@ -278,6 +278,7 @@
       border-radius: var(--radius-lg);
       padding: 18px;
       min-width: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,252,254,0.96));
     }
 
     .section h3 {
@@ -322,9 +323,9 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(103,232,249,0.18);
-      background: rgba(103,232,249,0.08);
-      color: #dffcff;
+      border: 1px solid rgba(37,99,235,0.16);
+      background: rgba(37,99,235,0.08);
+      color: #1d4ed8;
       font-size: 0.82rem;
       margin-bottom: 12px;
     }
@@ -381,18 +382,18 @@
       text-align: left;
     }
 
-    th {
+    .table-wrap th {
       position: sticky;
       top: 0;
       z-index: 1;
-      background: #0c1826;
-      color: #cfe4ff;
-      font-size: 0.8rem;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 0.76rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
     }
 
-    tr:hover td { background: rgba(103,232,249,0.03); }
+    tr:hover td { background: rgba(37,99,235,0.03); }
 
     .muted { color: var(--muted); }
     .mono { font-family: var(--mono); }
@@ -418,10 +419,10 @@
       opacity: 0.9;
     }
 
-    .status.unpaid, .status.waiting, .status.pending { color: #fbbf24; background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.2); }
-    .status.sent, .status.review, .status.approval { color: #67e8f9; background: rgba(103,232,249,0.12); border-color: rgba(103,232,249,0.2); }
-    .status.paid, .status.completed, .status.delivered, .status.archived, .status.done { color: #34d399; background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.2); }
-    .status.risk { color: #fb7185; background: rgba(251,113,133,0.12); border-color: rgba(251,113,133,0.2); }
+    .status.unpaid, .status.waiting, .status.pending { color: #b45309; background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.18); }
+    .status.sent, .status.review, .status.approval { color: #2563eb; background: rgba(37,99,235,0.10); border-color: rgba(37,99,235,0.16); }
+    .status.paid, .status.completed, .status.delivered, .status.archived, .status.done { color: #059669; background: rgba(5,150,105,0.10); border-color: rgba(5,150,105,0.16); }
+    .status.risk { color: #e11d48; background: rgba(225,29,72,0.10); border-color: rgba(225,29,72,0.16); }
 
     .cards {
       display: grid;
