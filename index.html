@@ -6,20 +6,20 @@
   <title>Jukebooth Producer Dashboard</title>
   <style>
     :root {
-      --bg: #f4f7fb;
-      --bg2: #eef3f9;
-      --panel: rgba(255, 255, 255, 0.82);
+      --bg: #eef2f7;
+      --bg2: #e9eef5;
+      --panel: rgba(255, 255, 255, 0.92);
       --panel-strong: #ffffff;
       --line: rgba(15, 23, 42, 0.08);
       --text: #0f172a;
-      --muted: #5d6b81;
+      --muted: #5b677b;
       --muted-2: #7a8799;
-      --accent: #2563eb;
-      --accent-2: #0f766e;
+      --accent: #111827;
+      --accent-2: #2563eb;
       --good: #059669;
       --warn: #b45309;
       --bad: #e11d48;
-      --chip: rgba(37, 99, 235, 0.10);
+      --chip: rgba(15, 23, 42, 0.06);
       --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
       --radius-lg: 22px;
       --radius-md: 16px;
@@ -37,9 +37,9 @@
       font-family: var(--font);
       color: var(--text);
       background:
-        radial-gradient(circle at 18% 0%, rgba(37,99,235,0.10), transparent 24%),
-        radial-gradient(circle at 82% 10%, rgba(15,118,110,0.08), transparent 28%),
-        linear-gradient(180deg, var(--bg), var(--bg2) 72%, #e9eef5 100%);
+        radial-gradient(circle at 18% 0%, rgba(17,24,39,0.08), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(37,99,235,0.05), transparent 28%),
+        linear-gradient(180deg, var(--bg), var(--bg2) 72%, #e8edf3 100%);
       background-attachment: fixed;
     }
 
@@ -76,6 +76,7 @@
       position: sticky;
       top: 18px;
       height: calc(100vh - 36px);
+      overflow: auto;
     }
 
     .brand {
@@ -165,6 +166,7 @@
       display: grid;
       gap: 18px;
       min-width: 0;
+      overflow: hidden;
     }
 
     .topbar {
@@ -569,6 +571,11 @@
         <div class="brand">
           <h1>Jukebooth Producer Dashboard</h1>
           <p>Fast, mobile-friendly command center for projects, invoices, contractors, and deliverables.</p>
+        </div>
+
+        <div class="note-box">
+          <h4>System status</h4>
+          <p>One clean source of truth for money in, money out, and what still needs to ship.</p>
         </div>
 
         <nav class="nav" id="nav"></nav>
