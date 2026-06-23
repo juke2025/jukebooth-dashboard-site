@@ -269,12 +269,113 @@
       font-size: 0.88rem;
     }
 
-    .content-grid {
+    .overview-strip {
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-      gap: 18px;
-      min-width: 0;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
     }
+
+    .overview-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.94);
+      padding: 14px;
+    }
+
+    .overview-card h4 {
+      margin: 0 0 6px;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .overview-card .big {
+      font-size: 1.35rem;
+      font-weight: 750;
+      letter-spacing: -0.03em;
+      margin: 0 0 4px;
+      color: #0f172a;
+    }
+
+    .overview-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .editor {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.94);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .editor summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 18px;
+      font-weight: 650;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .editor summary::-webkit-details-marker { display: none; }
+
+    .editor[open] summary {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .editor-body {
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .section-muted {
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.5;
+      margin: 6px 0 0;
+    }
+
+    .content-grid {
+      display: none;
+    }
+
+    .overview-strip,
+    .table-wrap,
+    .editor {
+      width: 100%;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.94);
+      margin-top: 14px;
+    }
+
+    .table-wrap table { min-width: 860px; }
+
+    .table-wrap th,
+    .table-wrap td { padding-left: 14px; padding-right: 14px; }
+
+    .table-wrap td:nth-child(5) { color: #64748b; }
+
+    .table-wrap td:last-child { white-space: nowrap; }
+
+    .table-wrap thead th { border-bottom: 1px solid var(--line); }
+
+    .table-wrap tbody tr:last-child td { border-bottom: 0; }
+
+    .editor { margin-top: 14px; }
 
     .section {
       border-radius: var(--radius-lg);
@@ -614,29 +715,41 @@
             <h3>Quick view</h3>
             <div class="tabs" id="tabs"></div>
           </div>
-          <div class="content-grid">
-            <div class="section" style="padding:0;border:none;background:transparent;box-shadow:none;">
-              <div class="table-wrap" id="tableWrap"></div>
+          <div class="overview-strip">
+            <div class="overview-card">
+              <h4>Open invoices</h4>
+              <div class="big" id="openInvoicesMetric">$0</div>
+              <p>Money still waiting to come in.</p>
             </div>
-            <div class="cards" id="sidePanel"></div>
+            <div class="overview-card">
+              <h4>Payables</h4>
+              <div class="big" id="payablesMetric">$0</div>
+              <p>What still needs to go out to contractors.</p>
+            </div>
+            <div class="overview-card">
+              <h4>Deliverables</h4>
+              <div class="big" id="deliverablesMetric">0</div>
+              <p>Edits and approvals still in motion.</p>
+            </div>
           </div>
+          <div class="table-wrap" id="tableWrap"></div>
         </section>
 
-        <section class="subtle-grid">
-          <div class="section">
-            <h3>Add new item</h3>
-            <div class="small" id="formHint">Pick a tab first, then add a row to that list.</div>
+        <details class="editor">
+          <summary>
+            <span>Add / update records</span>
+            <span class="small">Click to open</span>
+          </summary>
+          <div class="editor-body">
+            <div class="section-muted" id="formHint">Pick a tab first, then add a row to that list.</div>
             <div class="form" id="dynamicForm"></div>
             <div class="actions">
               <button class="action" id="addBtn">Add record</button>
               <button class="action secondary" id="clearFiltersBtn">Clear search</button>
             </div>
-          </div>
-          <div class="section">
-            <h3>Producer notes</h3>
             <div class="kpi-list" id="notesList"></div>
           </div>
-        </section>
+        </details>
       </main>
     </div>
   </div>
@@ -837,7 +950,6 @@
 
     function renderMetrics() {
       const outstanding = totalOutstandingInvoices();
-      const knownInvoices = state.invoices.filter(i => i.amount !== null && !/paid in full|completed/i.test(i.status)).length;
       const contractorBalance = totalContractors();
       const deliverableCount = pendingDeliverables();
       const activeCount = activeProjects();
@@ -847,24 +959,30 @@
         <div class="metric">
           <div class="label">Open client invoices</div>
           <div class="value">${money(outstanding)}</div>
-          <div class="foot">${knownInvoices} invoice(s) currently awaiting collection or approval.</div>
+          <div class="foot">Money waiting to come in.</div>
         </div>
         <div class="metric">
           <div class="label">Contractor payables</div>
           <div class="value">${money(contractorBalance)}</div>
-          <div class="foot">What still needs to go out to the crew.</div>
+          <div class="foot">Cash that still needs to go out.</div>
         </div>
         <div class="metric">
           <div class="label">Deliverables in queue</div>
           <div class="value">${deliverableCount}</div>
-          <div class="foot">Pending edits, approvals, and final deliveries.</div>
+          <div class="foot">Edits and approvals pending.</div>
         </div>
         <div class="metric">
           <div class="label">Active projects</div>
           <div class="value">${activeCount}</div>
-          <div class="foot">${paidCount} completed invoice(s) already closed out.</div>
+          <div class="foot">${paidCount} already completed.</div>
         </div>
       `;
+      const oi = document.getElementById('openInvoicesMetric');
+      const pay = document.getElementById('payablesMetric');
+      const del = document.getElementById('deliverablesMetric');
+      if (oi) oi.textContent = money(outstanding);
+      if (pay) pay.textContent = money(contractorBalance);
+      if (del) del.textContent = String(deliverableCount);
     }
 
     function makeTable(key) {
@@ -954,11 +1072,6 @@
       wrap.innerHTML = activeTab === 'overview' ? overviewPanel() : makeTable(activeTab);
       wrap.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', onDelete));
       wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', onEdit));
-    }
-
-    function renderSidePanel() {
-      const panel = document.getElementById('sidePanel');
-      panel.innerHTML = overviewPanel();
     }
 
     function renderNotes() {
@@ -1109,7 +1222,6 @@
       renderTabs();
       renderMetrics();
       renderTable();
-      renderSidePanel();
       renderNotes();
       renderForm();
       saveState();
